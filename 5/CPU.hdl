@@ -1,0 +1,66 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	//// Replace this comment with your code.
+    Mux16(a = instruction, b = preout, sel = instruction[15], out = inA);
+
+    Mux(a = true, b = instruction[5], sel = instruction[15], out = loadA); // 判断A寄存器的load位是来自A指令还是C指令
+    ARegister(in = inA, load = loadA, out = outA, out[0..14] = addressM);
+
+    Mux(a = false, b = instruction[12], sel = instruction[15], out = selAM); // 判断AM Mux的load位是来自A指令还是C指令
+    Mux16(a = outA, b = inM, sel = selAM, out = outAM);                        // 判断AM Mux的输出是A还是M
+
+    Mux(a = false, b = instruction[4], sel = instruction[15], out = loadC); // 判断A寄存器的load位是来自A指令还是C指令
+    DRegister(in = preout, load = loadC, out = outD);
+
+    ALU(x = outD, y = outAM, zx = instruction[11], nx = instruction[10], zy = instruction[9], ny = instruction[8],f = instruction[7], no = instruction[6], out = outM, out = preout, ng = ng, zr = zr);
+
+    And(a = instruction[3], b = instruction[15], out = writeM);
+
+
+    And(a = instruction[2], b = ng, out = con1);
+
+    Or(a = ng, b = zr, out = notPs);
+    Not(in = notPs, out = ps);
+    And(a = instruction[0], b = ps, out = con2);
+
+    And(a = instruction[1], b = zr, out = con3);
+
+    Or(a = con1, b = con2, out = loadPc1);
+    Or(a = loadPc1, b = con3, out = loadPc2);
+
+    And(a = instruction[15], b = loadPc2, out = loadPc);          //A指令不跳转
+
+    PC(in = outA, load = loadPc, inc = true, reset = reset, out[0..14] = pc);
+}
