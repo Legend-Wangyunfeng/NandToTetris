@@ -11,7 +11,7 @@ class Parser:
         # Opens the input file/stream and gets ready to parse it
         self.input_file = open(input_file, 'r')
         self.current_command = self.input_file.readline()
-        self.name = input_file.split("/")[-1].split(".vm")[0] + ".asm"
+        self.name = input_file.split("/")[-1].split(".vm")[0]
 
         self.command_type = None
 
