@@ -155,15 +155,12 @@ class CodeWriter:
             self.output_file.write('M=M-D\n')
             self.output_file.write('@SP\n')
             self.output_file.write('M=M+1\n')
-
-            
-            
+    
         elif command == 'neg':
             self.output_file.write('@SP\n')
             self.output_file.write('A=M-1\n')
             self.output_file.write('M=-M\n')
 
-            
         elif command == 'and':
             self.output_file.write('@SP\n')
             self.output_file.write('M=M-1\n')
@@ -172,7 +169,7 @@ class CodeWriter:
             self.output_file.write('@SP\n')
             self.output_file.write('M=M-1\n')
             self.output_file.write('A=M\n')
-            self.output_file.write('M=D&M')
+            self.output_file.write('M=D&M\n')
             self.output_file.write('@SP\n')
             self.output_file.write('M=M+1\n')
             
@@ -192,6 +189,83 @@ class CodeWriter:
             self.output_file.write('@SP\n')
             self.output_file.write('A=M-1\n')
             self.output_file.write('M=!M\n')
+
+            
+        elif command == 'eq':
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M-1\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('D=M\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M-1\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('D=M-D\n')
+            self.output_file.write('@TRUE_EQ\n')
+            self.output_file.write('D;JEQ\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('M=0\n')
+            self.output_file.write('@CONTINUE_EQ\n')
+            self.output_file.write('0;JMP\n')
+            self.output_file.write('(TRUE_EQ)\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('M=-1\n')
+            self.output_file.write('(CONTINUE_EQ)\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M+1\n')
+            
+        elif command == 'gt':
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M-1\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('D=M\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M-1\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('D=D-M\n')
+            self.output_file.write('@TRUE_GT\n')
+            self.output_file.write('D;JGT\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('M=0\n')
+            self.output_file.write('@CONTINUE_GT\n')
+            self.output_file.write('0;JMP\n')
+            self.output_file.write('(TRUE_GT)\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('M=-1\n')
+            self.output_file.write('(CONTINUE_GT)\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M+1\n')
+            
+        elif command == 'lt':
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M-1\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('D=M\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M-1\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('D=D-M\n')
+            self.output_file.write('@TRUE_LT\n')
+            self.output_file.write('D;JLT\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('M=0\n')
+            self.output_file.write('@CONTINUE_LT\n')
+            self.output_file.write('0;JMP\n')
+            self.output_file.write('(TRUE_LT)\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('A=M\n')
+            self.output_file.write('M=-1\n')
+            self.output_file.write('(CONTINUE_LT)\n')
+            self.output_file.write('@SP\n')
+            self.output_file.write('M=M+1\n')
+            
+        else:
+            raise ValueError(f'Invalid arithmetic command: {command}')
+
             
     def close(self):
         self.output_file.close()

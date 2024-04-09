@@ -2,7 +2,7 @@ from CodeWriter import CodeWriter
 from Parser import Parser, CommandType
 
 if __name__ == "__main__":
-    parser = Parser("./MemoryAccess/BasicTest/BasicTest.vm")
+    parser = Parser("./StackArithmetic/StackTest/StackTest.vm")
     code_writer = CodeWriter(parser.name)
     while parser.has_more_commands():
         
