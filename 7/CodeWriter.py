@@ -12,6 +12,7 @@ class CodeWriter:
     def __init__(self, file_name):
         self.file_name = file_name
         self.output_file = open(file_name + '.asm', 'w')
+        self.count = 0
 
     def WritePushPop(self, command, segment, index):
         if command == CommandType.C_PUSH:
@@ -115,16 +116,16 @@ class CodeWriter:
                 self.output_file.write('M=D\n')
                 
             elif segment == 'pointer':
+                self.output_file.write('@SP\n')
+                self.output_file.write('M=M-1\n')
+                self.output_file.write('A=M\n')
+                self.output_file.write('M=D\n')
                 if index == '0':
                     self.output_file.write('@THIS\n')
                 elif index == '1':
                     self.output_file.write('@THAT\n')
                 else:
                     raise ValueError(f'Invalid index for pointer segment: {index}')
-                self.output_file.write('D=M\n')
-                self.output_file.write('@SP\n')
-                self.output_file.write('M=M-1\n')
-                self.output_file.write('A=M\n')
                 self.output_file.write('M=D\n')
                 
           
@@ -200,20 +201,21 @@ class CodeWriter:
             self.output_file.write('M=M-1\n')
             self.output_file.write('A=M\n')
             self.output_file.write('D=M-D\n')
-            self.output_file.write('@TRUE_EQ\n')
+            self.output_file.write(f'@TRUE_EQ_{self.count}\n')
             self.output_file.write('D;JEQ\n')
             self.output_file.write('@SP\n')
             self.output_file.write('A=M\n')
             self.output_file.write('M=0\n')
-            self.output_file.write('@CONTINUE_EQ\n')
+            self.output_file.write(f'@CONTINUE_EQ_{self.count}\n')
             self.output_file.write('0;JMP\n')
-            self.output_file.write('(TRUE_EQ)\n')
+            self.output_file.write(f'(TRUE_EQ_{self.count})\n')
             self.output_file.write('@SP\n')
             self.output_file.write('A=M\n')
             self.output_file.write('M=-1\n')
-            self.output_file.write('(CONTINUE_EQ)\n')
+            self.output_file.write(f'(CONTINUE_EQ_{self.count})\n')
             self.output_file.write('@SP\n')
             self.output_file.write('M=M+1\n')
+            self.count += 1
             
         elif command == 'gt':
             self.output_file.write('@SP\n')
@@ -223,21 +225,22 @@ class CodeWriter:
             self.output_file.write('@SP\n')
             self.output_file.write('M=M-1\n')
             self.output_file.write('A=M\n')
-            self.output_file.write('D=D-M\n')
-            self.output_file.write('@TRUE_GT\n')
+            self.output_file.write('D=M-D\n')
+            self.output_file.write(f'@TRUE_GT_{self.count}\n')
             self.output_file.write('D;JGT\n')
             self.output_file.write('@SP\n')
             self.output_file.write('A=M\n')
             self.output_file.write('M=0\n')
-            self.output_file.write('@CONTINUE_GT\n')
+            self.output_file.write(f'@CONTINUE_GT_{self.count}\n')
             self.output_file.write('0;JMP\n')
-            self.output_file.write('(TRUE_GT)\n')
+            self.output_file.write(f'(TRUE_GT_{self.count})\n')
             self.output_file.write('@SP\n')
             self.output_file.write('A=M\n')
             self.output_file.write('M=-1\n')
-            self.output_file.write('(CONTINUE_GT)\n')
+            self.output_file.write(f'(CONTINUE_GT_{self.count})\n')
             self.output_file.write('@SP\n')
             self.output_file.write('M=M+1\n')
+            self.count += 1
             
         elif command == 'lt':
             self.output_file.write('@SP\n')
@@ -247,21 +250,22 @@ class CodeWriter:
             self.output_file.write('@SP\n')
             self.output_file.write('M=M-1\n')
             self.output_file.write('A=M\n')
-            self.output_file.write('D=D-M\n')
-            self.output_file.write('@TRUE_LT\n')
+            self.output_file.write('D=M-D\n')
+            self.output_file.write(f'@TRUE_LT_{self.count}\n')
             self.output_file.write('D;JLT\n')
             self.output_file.write('@SP\n')
             self.output_file.write('A=M\n')
             self.output_file.write('M=0\n')
-            self.output_file.write('@CONTINUE_LT\n')
+            self.output_file.write(f'@CONTINUE_LT_{self.count}\n')
             self.output_file.write('0;JMP\n')
-            self.output_file.write('(TRUE_LT)\n')
+            self.output_file.write(f'(TRUE_LT_{self.count})\n')
             self.output_file.write('@SP\n')
             self.output_file.write('A=M\n')
             self.output_file.write('M=-1\n')
-            self.output_file.write('(CONTINUE_LT)\n')
+            self.output_file.write(f'(CONTINUE_LT_{self.count})\n')
             self.output_file.write('@SP\n')
             self.output_file.write('M=M+1\n')
+            self.count += 1
             
         else:
             raise ValueError(f'Invalid arithmetic command: {command}')

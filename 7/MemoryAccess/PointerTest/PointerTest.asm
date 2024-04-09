@@ -5,11 +5,11 @@ A=M
 M=D
 @SP
 M=M+1
-@THIS
-D=M
 @SP
 M=M-1
 A=M
+M=D
+@THIS
 M=D
 @3040
 D=A
@@ -18,11 +18,11 @@ A=M
 M=D
 @SP
 M=M+1
-@THAT
-D=M
 @SP
 M=M-1
 A=M
+M=D
+@THAT
 M=D
 @32
 D=A

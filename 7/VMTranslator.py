@@ -1,8 +1,10 @@
 from CodeWriter import CodeWriter
 from Parser import Parser, CommandType
-
+import sys
 if __name__ == "__main__":
-    parser = Parser("./StackArithmetic/StackTest/StackTest.vm")
+    # 读取命令行参数
+    
+    parser = Parser(sys.argv[1])
     code_writer = CodeWriter(parser.name)
     while parser.has_more_commands():
         
