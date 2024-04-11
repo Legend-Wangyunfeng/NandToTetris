@@ -8,7 +8,7 @@ M=M+1
 @SP
 M=M-1
 A=M
-M=D
+D=M
 @THIS
 M=D
 @3040
@@ -21,7 +21,7 @@ M=M+1
 @SP
 M=M-1
 A=M
-M=D
+D=M
 @THAT
 M=D
 @32

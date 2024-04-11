@@ -119,7 +119,7 @@ class CodeWriter:
                 self.output_file.write('@SP\n')
                 self.output_file.write('M=M-1\n')
                 self.output_file.write('A=M\n')
-                self.output_file.write('M=D\n')
+                self.output_file.write('D=M\n')
                 if index == '0':
                     self.output_file.write('@THIS\n')
                 elif index == '1':
