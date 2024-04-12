@@ -8,6 +8,9 @@ class CommandType(Enum):
     C_LABEL = 3
     C_IF = 4
     C_GOTO = 5
+    C_FUNCTION = 6
+    C_RETURN = 7
+    C_CALL = 8
 
 class Parser:
     def __init__(self, input_file):
@@ -44,6 +47,12 @@ class Parser:
             self.command_type = CommandType.C_IF
         elif self.current_command.startswith("goto"):
             self.command_type = CommandType.C_GOTO
+        elif self.current_command.startswith("function"):
+            self.command_type = CommandType.C_FUNCTION
+        elif self.current_command.startswith("return"):
+            self.command_type = CommandType.C_RETURN           
+        elif self.current_command.startswith("call"):
+            self.command_type = CommandType.C_CALL
         else:
             self.command_type = CommandType.C_ARITHMETIC
 
@@ -53,13 +62,15 @@ class Parser:
         if self.command_type == None:
             self.commandType()
 
-        if self.command_type in [CommandType.C_POP, CommandType.C_PUSH, CommandType.C_LABEL, CommandType.C_IF, CommandType.C_GOTO]:
+        if self.command_type in [CommandType.C_POP, CommandType.C_PUSH, CommandType.C_LABEL, CommandType.C_IF, CommandType.C_GOTO, CommandType.C_FUNCTION, CommandType.C_CALL]:
             return self.current_command.split(" ")[1]
         elif self.command_type == CommandType.C_ARITHMETIC:
             return self.current_command.split(" ")[0]
+        else:
+            return None
         
     def arg2(self):
-        if self.command_type == CommandType.C_PUSH or self.command_type == CommandType.C_POP:
+        if self.command_type in [CommandType.C_PUSH, CommandType.C_POP, CommandType.C_FUNCTION, CommandType.C_CALL]:
             return self.current_command.split(" ")[2]
         else:
             return None
