@@ -1,3 +1,4 @@
 *.hack
 *.zip
+*.pdf
 __pycache__

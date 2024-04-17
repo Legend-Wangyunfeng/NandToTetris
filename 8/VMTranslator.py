@@ -42,30 +42,29 @@ if __name__ == "__main__":
     if os.path.isfile(target):
         parser = Parser(target)
         code_writer = CodeWriter(parser.name)
-        code_writer.bootstrap()
         parse_singleVM(parser, code_writer)
+
+        parser.close_file()
+        code_writer.close_file()
+        
     elif os.path.isdir(target):
+        output_file = os.path.join(target, os.path.basename(target))
+        print(output_file)
+        final_code_writer = CodeWriter(output_file)
+        final_code_writer.bootstrap()
+
         for root, dirs, files in os.walk(target):
             for file in files:
                 if file.endswith(".vm"):
                     parser = Parser(os.path.join(root, file))
                     code_writer = CodeWriter(parser.name)
                     parse_singleVM(parser, code_writer)
-        # 把所有生成的.asm文件写入同一个.asm文件，以文件夹名命名
+                    parser.close_file()
+                
+                    with open(parser.name + '.asm', "r") as f:
+                        final_code_writer.Write(f.read())
 
-        output_file = os.path.join(target, os.path.basename(target) + ".asm")
-        print(output_file)
-        with open(output_file, "w") as f:
-            output_file.write('@256\n')
-            output_file.write('D=A\n')
-            output_file.write('@SP\n')
-            output_file.write('M=D\n')
-            WriteCall('Sys.init', '0')
-            for file in files:
-                if file.endswith(".asm"):
-                    with open(os.path.join(root, file), "r") as g:
-                        f.write(g.read())
-
+        final_code_writer.close_file()
     else:
         raise Exception("Invalid target")
     

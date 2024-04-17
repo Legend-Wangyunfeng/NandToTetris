@@ -8,12 +8,15 @@ class CodeWriter:
         'this': 'THIS',
         'that': 'THAT',
     }
-
+    return_address_count = 0
     def __init__(self, file_name):
         self.file_name = file_name
         self.output_file = open(file_name + '.asm', 'w')
         self.count = 0
 
+    def Write(self, content):
+        self.output_file.write(content)
+        
     def WritePushPop(self, command, segment, index):
         self.output_file.write(f'// {command} {segment} {index}\n')
         if command == CommandType.C_PUSH:
@@ -351,11 +354,15 @@ class CodeWriter:
     
     def WriteCall(self, function_name, num_args):
         # push return-address
+        
+        self.output_file.write(f'@{function_name}$ret.{num_args}_{CodeWriter.return_address_count}\n')
+        self.output_file.write('D=A\n')
         self.output_file.write('@SP\n')
         self.output_file.write('A=M\n')
-        self.output_file.write('M=A\n')
+        self.output_file.write('M=D\n')
         self.output_file.write('@SP\n')
         self.output_file.write('M=M+1\n')
+
         # push LCL
         self.output_file.write('@LCL\n')
         self.output_file.write('D=M\n')
@@ -406,7 +413,9 @@ class CodeWriter:
         self.output_file.write(f'@{function_name}\n')
         self.output_file.write('0;JMP\n')
         # (return-address)
-        self.output_file.write(f'({function_name}$ret.{num_args})\n')
+        self.output_file.write(f'({function_name}$ret.{num_args}_{CodeWriter.return_address_count})\n')
+
+        CodeWriter.return_address_count += 1
 
     def bootstrap(self):
         self.output_file.write('@256\n')
