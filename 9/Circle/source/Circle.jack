@@ -1,0 +1,92 @@
+/** Implements a graphical circle.
+    The circle has circle center x and y coordinates, and a radius. */
+
+class Circle {
+    field int x, y;
+    field int radius;
+
+    constructor Circle new(int cx, int cy, int cradius) {
+        let x = cx;
+        let y = cy;
+        let radius = cradius;
+        do draw();
+        return this;
+    }
+
+    method void draw() {
+      // Draws the Circle using the color black
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x, y, radius);
+      return;
+   }
+
+   /** Disposes this Circle. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Erases this Circle. */
+   method void erase() {
+      // Draws the square using the color white (background color)
+      do Screen.setColor(false);
+      do Screen.drawRectangle(x, y, radius);
+      return;
+   }
+
+    /** Increments the Circle radius by 2 pixels (if possible). */
+   method void incSize() {
+      if (((y + radius) < 254) & ((x + radius) < 510)) {
+         do erase();
+         let radius = radius + 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Decrements the Circle radius by 2 pixels (if possible). */
+   method void decSize() {
+      if (radius > 2) {
+         do erase();
+         let radius = radius - 2;
+         do draw();
+      }
+      return;
+   }
+
+   method void moveUp() {
+      if (y > radius + 1) {
+         do erase();
+         let y = y - 2;
+         do draw();
+      }
+      return;
+   }
+
+   method void moveDown() {
+      if (y < 255 - radius) {
+         do erase();
+         let y = y + 2;
+         do draw();
+      }
+      return;
+   }
+
+   method void moveLeft() {
+      if (x > radius + 1) {
+         do erase();
+         let x = x - 2;
+         do draw();
+      }
+      return;
+   }
+
+   method void moveRight() {
+      if (x < 511 - radius) {
+         do erase();
+         let x = x + 2;
+         do draw();
+      }
+      return;
+   }
+}

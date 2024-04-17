@@ -1,0 +1,12 @@
+/** Initializes a new Circle game and starts running it. */
+
+class Main {
+    function void main() {
+        var CircleGame game;
+        let game = CircleGame.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}
+
