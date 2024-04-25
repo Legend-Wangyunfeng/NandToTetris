@@ -1,0 +1,53 @@
+class CircleGame {
+    field Circle circle;
+    field int direction;
+
+    constructor CircleGame new() {
+        let circle = Circle.new(30, 30, 30);
+        let direction = 0;
+        return this;
+    }
+
+    method void dispose() {
+      do circle.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   method void moveCircle() {
+      if (direction = 1) { do circle.moveUp(); }
+      if (direction = 2) { do circle.moveDown(); }
+      if (direction = 3) { do circle.moveLeft(); }
+      if (direction = 4) { do circle.moveRight(); }
+      do Sys.wait(5);  // delays the next movement
+      return;
+   }
+
+   method void run() {
+      var char key;  // the key currently pressed by the user
+      var boolean exit;
+      let exit = false;
+      
+      while (~exit) {
+         // waits for a key to be pressed
+         while (key = 0) {
+            let key = Keyboard.keyPressed();
+            do moveCircle();
+         }
+         if (key = 81)  { let exit = true; }     // q key
+         if (key = 90)  { do circle.decSize(); } // z key
+         if (key = 88)  { do circle.incSize(); } // x key
+         if (key = 131) { let direction = 1; }   // up arrow
+         if (key = 133) { let direction = 2; }   // down arrow
+         if (key = 130) { let direction = 3; }   // left arrow
+         if (key = 132) { let direction = 4; }   // right arrow
+
+         // waits for the key to be released
+         while (~(key = 0)) {
+            let key = Keyboard.keyPressed();
+            do moveCircle();
+         }
+     } // while
+     return;
+   }
+}
