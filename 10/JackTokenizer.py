@@ -1,91 +1,101 @@
-from enum import Enum
-
-class TokenType(Enum):
-    KEYWORD = 1
-    SYMBOL = 2
-    IDENTIFIER = 3
-    INT_CONST = 4
-    STRING_CONST = 5
+import re
+import consts
+import time
 
 class JackTokenizer:
-    def __init__(self, file_name):
-        self.file_name = file_name
-        
-        self.keywords = ['class', 'constructor', 'function', 'method', 'field', 'static',
-                          'var', 'int', 'char', 'boolean', 'void', 'true', 'false', 'null',
-                          'this', 'let', 'do', 'if', 'else', 'while', 'return']
-        self.symbols = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', '/', '&', '|', '<', '>', '=', '~']
-        self.tokenType = None
-      
-        self.input_file = open(file_name, 'r')
-        self.name = file_name.split(".jack")[0]
+    def __init__(self, file_path):
+        self.text = file_path.read()
+        self.token = ""
+        self.type = None
+        self.sanitize()
 
-        self.current_command = self.input_file.readline()
-        self.current_token = None
-        self.token_list = []
+    def sanitize(self):
+        # Remove comments
+        self.text = re.sub(consts.REGEX_COMMENTS, consts.EMPTY, self.text)
 
-    def advanceCommands(self):
-        # Reads the next command from the input and makes it the current command.
-        # Should be called only if has_more_commands() is true.
-        # Initially there is no current command.
-        self.current_command = self.input_file.readline()
+    def keyword(self):
 
-    def hasMoreCommands(self):
-        if self.current_command:
-            # 处理掉注释
-            # 单行注释以 // 开头
-            # 多行注释以 /* 开头，以 */ 结尾
-            self.current_command = self.current_command.strip()
+        return self.token.upper()
+    
+    def symbol(self):
 
-            if self.current_command.startswith("/**"):
-                while not self.current_command.endswith("*/"):
-                    self.advanceCommands()
-                    self.current_command = self.current_command.strip()
-                    
-                self.advanceCommands()
-                return self.hasMoreCommands()
-            else:
-                self.current_command = self.current_command.split("//")[0]
-                self.token_list = self.current_command.split()
-                # self.current_token = self.token_list[0] if len(self.token_list) > 0 else None
-                return True
+        return self.token
+    
+    def identifier(self):
 
-        else:
+        return self.token
+    
+    def int_val(self):
+
+        return int(self.token)
+    
+    def string_val(self):
+
+        return self.token
+    
+    def tokenType(self):
+
+        return self.type
+
+    
+
+    def has_more_tokens(self):
+        if re.fullmatch(consts.REGEX_EMPTY_TEXT, self.text):
             return False
+        return True
+
+    def advance(self):
+        if self.has_more_tokens():
+            REGEX_TO_ACTION = [
+                (consts.REGEX_KEYWORD, self._set_keyword_props),
+                (consts.REGEX_SYMBOL, self._set_symbol_props),
+                (consts.REGEX_DIGIT, self._set_digit_props),
+                (consts.REGEX_STRING, self._set_string_props),
+                (consts.REGEX_IDENTIFIER, self._set_identifier_props)
+            ]
+
+            for regex, action in REGEX_TO_ACTION:
+                match = re.match(regex, self.text)
+                if match:
+                    action(match)
+                    return
+                
+    def _set_general_props(self, match, regex, tokenType):
+        self.token = match.group(1)
+        if tokenType == consts.SYMBOL and self.token in consts.OPERATORS_MAP:
+            self.token = consts.OPERATORS_MAP[self.token]
+
+        self.type = tokenType
+        self.text = re.sub(regex, consts.EMPTY, self.text)
+
+    def _set_keyword_props(self, match):
+        self._set_general_props(match, consts.REGEX_KEYWORD, consts.KEYWORD)
+
+    def _set_symbol_props(self, match):
+        self._set_general_props(match, consts.REGEX_SYMBOL, consts.SYMBOL)
+
         
-    def hasMoreTokens(self):
-        # Returns true if there are more tokens to read, false otherwise.
-        if len(self.token_list) > 0:
-            return True
-        else:
-            return False
+    def _set_digit_props(self, match):
+        self._set_general_props(match, consts.REGEX_DIGIT, consts.INT_CONST)
 
-    def advanceTokens(self):
-        # Reads the next token from the current command and makes it the current token.
-        # Should be called only if has_more_tokens() is true.
-        # Initially there is no current token.
-        if self.hasMoreTokens():
-            self.current_token = self.token_list.pop(0)
-            #如果self.current_token末尾字符为“,”，则去掉这个“,”
-            if self.current_token.endswith(","):
-                self.current_token = self.current_token[:-1]
-            #如果self.current_token末尾字符为“;”，则将这个“;”作为单独的一个token
-            elif self.current_token.endswith(";") and self.current_token != ";":
-                self.current_token = self.current_token[:-1]
-                self.token_list.append(";")
+    def _set_string_props(self, match):
+        self._set_general_props(match, consts.REGEX_STRING, consts.STRING_CONST)
 
+        
+    def _set_identifier_props(self, match):
+        self._set_general_props(match, consts.REGEX_IDENTIFIER, consts.IDENTIFIER)
 
 
 if __name__ == "__main__":
-    # Test the JackTokenizer
-    file_name = "./Square/Main.jack"
-    tokenizer = JackTokenizer(file_name)
-    while tokenizer.hasMoreCommands():
-        while tokenizer.hasMoreTokens():
-            print(tokenizer.current_token)
-            tokenizer.advanceTokens()
 
-        tokenizer.advanceCommands()
-            
-
-
+    # 打开一个文件，向其写入
+    res = open("./res/MainT.xml", "w")
+    res.write("<tokens>\n")
+    with open("./ArrayTest/Main.jack", "r") as file:
+        jt = JackTokenizer(file)
+        while jt.has_more_tokens():
+            jt.advance()
+            print(jt.token)
+            res.write(f"<{jt.tokenType()}> {jt.token} </{jt.tokenType()}>\n")
+    res.write("</tokens>")
+    res.close()
