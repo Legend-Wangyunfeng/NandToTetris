@@ -17,34 +17,34 @@ REGEX_COMMENTS = "(//.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)"
 
 
 KEYWORDS = [
-    "CLASS",
-    "DO", 
-    "IF", 
-    "ELSE", 
-    "WHILE", 
-    "RETURN", 
-    "FUNCTION", 
-    "CONSTRUCTOR", 
-    "INT",
-    "BOOLEAN", 
-    "CHAR",
-    "METHOD",
-    "VOID", 
-    "VAR", 
-    "STATIC", 
-    "FIELD", 
-    "LET",
-    "TRUE", 
-    "FALSE",
-    "NULL", 
-    "THIS"
+    "class",
+    "do", 
+    "if", 
+    "else", 
+    "while", 
+    "return", 
+    "function", 
+    "constructor", 
+    "int",
+    "boolean", 
+    "char",
+    "method",
+    "void", 
+    "var", 
+    "static", 
+    "field", 
+    "let",
+    "true", 
+    "false",
+    "null", 
+    "this"
 ]
 
-LEGAL_EXPRESSIONS = [
-    "TRUE", 
-    "FALSE",
-    "NULL", 
-    "THIS"
+KEYWORD_CONSTANT = [
+    "true", 
+    "false",
+    "null", 
+    "this"
 ]
 
 KEYWORD = "keyword"
@@ -81,3 +81,10 @@ COMMA = ","
 
 EMPTY = ""
 
+STATEMENT_KEYWORDS = [
+    "let",
+    "if",
+    "while",
+    "do",
+    "return"
+]

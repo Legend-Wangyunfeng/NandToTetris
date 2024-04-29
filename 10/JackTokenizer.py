@@ -15,7 +15,7 @@ class JackTokenizer:
 
     def keyword(self):
 
-        return self.token.upper()
+        return self.token
     
     def symbol(self):
 
