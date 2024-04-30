@@ -1,10 +1,10 @@
 import consts
+from JackTokenizer import JackTokenizer
 
 class CompilationEngine:
-
     def __init__(self, tokenizer, output_file):
         self.tokenizer = tokenizer
-        self.output_file = output_file
+        self.output_file = open(output_file, 'w')
 
 
     def compileClass(self):
@@ -165,8 +165,72 @@ class CompilationEngine:
             self.compileTerm()
         self.output_file.write('</expression>\n')
 
+    def compileIntConst(self):
+        self.output_file.write('<integerConstant>\n')
+        self.process(self.tokenizer.token)
+        self.output_file.write('</integerConstant>\n')
+
         
+    def compileStringConst(self):
+        self.output_file.write('<stringConstant>\n')
+        self.process(self.tokenizer.token)
+        self.output_file.write('</stringConstant>\n')
+
+        
+    def compileKeywordConstant(self):
+        self.output_file.write('<keyword>\n')
+        self.process(self.tokenizer.token)
+        self.output_file.write('</keyword>\n')
+
+        
+    def compileIdentifier(self):
+        self.output_file.write('<identifier>\n')
+        self.process(self.tokenizer.token)
+        self.output_file.write('</identifier>\n')
+
+        
+    def compileSymbol(self):
+        self.output_file.write('<symbol>\n')
+        self.process(self.tokenizer.token)
+        self.output_file.write('</symbol>\n')
+
+
     def compileTerm(self):
+
+        tt = self.tokenizer.type
+        should_advance = True
+
+        self.output_file.write('<term>\n')
+
+        if (self.tokenizer.token == "("):
+            self.process("(")
+            self.compileExpression()
+            self.process(")")
+        elif (self.tokenizer.token == "-" or self.tokenizer.token == "~"):
+            if (self.tokenizer.token == "-"):
+                self.process("-")
+            else:
+                self.process("~")
+                
+            self.compileTerm()
+            
+        elif (self.tokenizer.token in consts.KEYWORD_CONSTANTS):
+            self.compileKeywordConstant()
+            
+        elif (tt == consts.IDENTIFIERS):
+            self.compileIdentifier()
+            
+        elif (tt == consts.INT_CONST):
+            self.compileIntConst()
+            
+        elif (tt == consts.STRING_CONST):
+            self.compileStringConst()
+            
+        elif (self.tokenizer.token in consts.SYMBOLS):
+            self.compileSymbol()
+            
+        else:
+            print("syntax error")
 
         
     def compileExpressionList(self):
@@ -187,3 +251,16 @@ class CompilationEngine:
 
     def printXMLToken(self, tokenType, string):
         self.output_file.write(f'<{tokenType}> {string} </{tokenType}>\n')
+
+if __name__ == "__main__":
+
+    input_file = "./ArrayTest/Main.jack"
+    output_file = "./res/ArrayTestMain.xml"
+    
+
+    with open(input_file, "r") as file:
+        jt = JackTokenizer(file)
+        ja = CompilationEngine(jt, output_file)
+
+        ja.compileClass()
+            
